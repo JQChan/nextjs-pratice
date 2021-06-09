@@ -35,3 +35,30 @@ export function getSortedPostsData() {
     }
   });
 }
+
+export function getAllPostIds() {
+  const fileNames = fs.readdirSync(postsDirectory);
+
+  return fileNames.map((fileName) => {
+    return {
+      params: {
+        id: fileName.replace(/\.md$/, ""),
+      },
+    };
+  });
+}
+
+export function getPostData(id) {
+  // 读取文件路径和文件内容
+  const fullPath = path.join(postsDirectory, `${id}.md`);
+  const fileContents = fs.readFileSync(fullPath, "utf-8");
+
+  // 使用gray-matter解析文件内容
+  const matterResult = matter(fileContents);
+
+  return {
+    id,
+    ...matterResult.data,
+  }
+  
+}
