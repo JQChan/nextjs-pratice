@@ -1,6 +1,8 @@
 import fs from "fs";
 import path from "path";
 import matter from "gray-matter";
+import remark from 'remark';
+import html from 'remark-html';
 
 const postsDirectory = path.join(process.cwd(), "posts");
 
@@ -48,7 +50,7 @@ export function getAllPostIds() {
   });
 }
 
-export function getPostData(id) {
+export async function getPostData(id) {
   // 读取文件路径和文件内容
   const fullPath = path.join(postsDirectory, `${id}.md`);
   const fileContents = fs.readFileSync(fullPath, "utf-8");
@@ -56,8 +58,13 @@ export function getPostData(id) {
   // 使用gray-matter解析文件内容
   const matterResult = matter(fileContents);
 
+  // 使用remark 转换markdown到html
+  const processedContent = await remark().use(html).process(matterResult.content)
+  const contentHtml = processedContent.toString();
+
   return {
     id,
+    contentHtml,
     ...matterResult.data,
   }
   
